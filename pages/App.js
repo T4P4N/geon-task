@@ -10,7 +10,9 @@ import {
   Page,
   ResourceList,
   ResourceItem,
-  Thumbnail
+  Thumbnail,
+  Pagination,
+  Spinner
   
 } from "@shopify/polaris";
 import React from "react";
@@ -19,17 +21,19 @@ export default function App() {
 	const [data, setData] = useState(null)
  	const resourceName = {singular:"product", plural:"products"};
 	const [productRows, setProductRows] = useState([])
-	const API_ENDPOINT = 'https://api.escuelajs.co/api/v1/products'
+	const API_BASE = 'https://api.escuelajs.co/api/v1/products'
+	const [prevOffset, setPrevOffset] = useState(0)
 	const [products, setProducts ] = useState([])
-	const [loading, setLoading ] = useState(true)
+	const [loading, setLoading ] = useState(null)
 	useEffect(()=>{
-		fetch(API_ENDPOINT)
+		setLoading(true)
+		fetch(`${API_BASE}?offset=${prevOffset}&limit=10`)
 		      .then((res) => res.json())
 		      .then((data) => {
 		      	setProducts(data);
 		      	setLoading(false)
 		      })
-	},[])
+	},[prevOffset])
 	
 
 	 // const [product, setProduct] = useState(
@@ -62,7 +66,7 @@ export default function App() {
 	 			</IndexTable.Cell>
 			
 	 			<IndexTable.Cell>
-	 				{price}
+	 				${price}
 	 			</IndexTable.Cell>
 
 	 			<IndexTable.Cell>
@@ -78,8 +82,9 @@ export default function App() {
 
 	 	);
   return (
-    <AppProvider>
-    		<Card title="Product List">
+    <Page title="Product List">
+    		<Card>
+    				{loading?<Spinner accessibilityLabel="Spinner example" size="large" />:
 					<IndexTable
 						resourceName={resourceName}
 						itemCount={products.length}
@@ -98,7 +103,25 @@ export default function App() {
 					>
 						{rowMarkup}
 					</IndexTable>
+    				}
+    				<Pagination
+						hasPrevious
+						onPrevious={() => {
+							if (prevOffset>=10) {
+								setPrevOffset(prevOffset-10)
+							}else{
+								console.log("Do nothing!")
+							}
+						}}
+						hasNext
+						onNext={() => {
+							if(prevOffset>=0){
+								setPrevOffset(prevOffset+10)
+							} else {
+								console.log("Do nothing!")
+							}
+						 }}/>
     		</Card>
-    </AppProvider>
+    </Page>
   )
 }
