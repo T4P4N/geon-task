@@ -82,6 +82,7 @@ export default function App() {
 
 	 	);
   return (
+   <AppProvider>
     <Page title="Product List">
     		<Card>
     				{loading?<Spinner accessibilityLabel="Spinner example" size="large" />:
@@ -123,5 +124,6 @@ export default function App() {
 						 }}/>
     		</Card>
     </Page>
+   </AppProvider>
   )
 }
